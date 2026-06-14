@@ -5,14 +5,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 
-# Download NLTK resources (fixes deployment errors)
+
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Title
 st.title("📧 Email Spam Detection App")
 
-# Sample dataset (no CSV needed)
+
 emails = [
     "Win a free iPhone now!!!",
     "Meeting scheduled at 3 PM tomorrow",
@@ -22,25 +21,25 @@ emails = [
     "Lunch with team at 1 PM",
     "Exclusive offer just for you, click here!"
 ]
-labels = [1, 0, 1, 0, 1, 0, 1]  # 1 = spam, 0 = ham
+labels = [1, 0, 1, 0, 1, 0, 1]  
 
-# TF-IDF vectorizer
+
 vectorizer = TfidfVectorizer(max_features=5000)
 X = vectorizer.fit_transform(emails)
 
-# Train/test split
+
 X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.3, random_state=42)
 
-# Train model
+
 model = MultinomialNB()
 model.fit(X_train, y_train)
 
-# Evaluate
+
 y_pred = model.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
 st.write(f"✅ Model trained with accuracy: {acc:.2f}")
 
-# User input
+
 st.subheader("Try it yourself:")
 user_input = st.text_area("Enter an email message:")
 
