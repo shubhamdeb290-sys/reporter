@@ -5,14 +5,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 
-# Download NLTK resources (fixes deployment errors)
+# Download NLTK resources
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Title
 st.title("📧 Email Spam Detection App")
 
-# Sample dataset (no CSV needed)
+# Expanded sample dataset
 emails = [
     "Win a free iPhone now!!!",
     "Meeting scheduled at 3 PM tomorrow",
@@ -20,9 +19,12 @@ emails = [
     "Project report submission deadline is Monday",
     "Get cheap loans instantly, apply today!",
     "Lunch with team at 1 PM",
-    "Exclusive offer just for you, click here!"
+    "Exclusive offer just for you, click here!",
+    "Your order has been shipped",
+    "Can we reschedule our call?",
+    "Happy birthday! Have a great day"
 ]
-labels = [1, 0, 1, 0, 1, 0, 1]  # 1 = spam, 0 = ham
+labels = [1,0,1,0,1,0,1,0,0,0]  # 1 = spam, 0 = ham
 
 # TF-IDF vectorizer
 vectorizer = TfidfVectorizer(max_features=5000)
@@ -40,17 +42,18 @@ y_pred = model.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
 st.write(f"✅ Model trained with accuracy: {acc:.2f}")
 
-# User input
-st.subheader("Try it yourself:")
-user_input = st.text_area("Enter an email message:")
+# User input for multiple messages
+st.subheader("Test multiple messages:")
+multi_input = st.text_area("Enter messages separated by new lines:")
 
-if st.button("Check Spam"):
-    if user_input.strip() != "":
-        input_vec = vectorizer.transform([user_input])
-        prediction = model.predict(input_vec)[0]
-        if prediction == 1:
-            st.error("🚨 This looks like SPAM!")
-        else:
-            st.success("📩 This looks like HAM (not spam).")
+if st.button("Check Messages"):
+    messages = [m.strip() for m in multi_input.split("\n") if m.strip()]
+    if messages:
+        for msg in messages:
+            pred = model.predict(vectorizer.transform([msg]))[0]
+            if pred == 1:
+                st.error(f"🚨 SPAM → {msg}")
+            else:
+                st.success(f"📩 HAM → {msg}")
     else:
-        st.warning("Please enter a message first.")
+        st.warning("Please enter at least one message.")
