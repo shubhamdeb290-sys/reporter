@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
@@ -13,32 +12,31 @@ nltk.download('punkt')
 # Title
 st.title("📧 Email Spam Detection App")
 
-# Load dataset (replace with your own CSV if needed)
-@st.cache_data
-def load_data():
-    data = pd.read_csv("spam.csv", encoding="latin-1")[['v1','v2']]
-    data.columns = ['label','message']
-    data['label'] = data['label'].map({'ham':0, 'spam':1})
-    return data
-
-data = load_data()
-
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    data['message'], data['label'], test_size=0.2, random_state=42
-)
+# Sample dataset (no CSV needed)
+emails = [
+    "Win a free iPhone now!!!",
+    "Meeting scheduled at 3 PM tomorrow",
+    "Congratulations! You won a lottery, claim now",
+    "Project report submission deadline is Monday",
+    "Get cheap loans instantly, apply today!",
+    "Lunch with team at 1 PM",
+    "Exclusive offer just for you, click here!"
+]
+labels = [1, 0, 1, 0, 1, 0, 1]  # 1 = spam, 0 = ham
 
 # TF-IDF vectorizer
 vectorizer = TfidfVectorizer(max_features=5000)
-X_train_vec = vectorizer.fit_transform(X_train)
-X_test_vec = vectorizer.transform(X_test)
+X = vectorizer.fit_transform(emails)
+
+# Train/test split
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.3, random_state=42)
 
 # Train model
 model = MultinomialNB()
-model.fit(X_train_vec, y_train)
+model.fit(X_train, y_train)
 
 # Evaluate
-y_pred = model.predict(X_test_vec)
+y_pred = model.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
 st.write(f"✅ Model trained with accuracy: {acc:.2f}")
 
